@@ -116,23 +116,41 @@ Light* createLight(double x, double y, double angle) {
 }
 
 void showLight(char* head, Light* light) {
-	printf("%s: \tx = %lf, y = %lf, a = %lf\n", head, light->x, light->y, light->angle / PI * 180.0);
+	printf("%s: x = %lf, y = %lf, a = %lf\n", head, light->x, light->y, light->angle / PI * 180.0);
+}
+
+double calcNode(Light* l1, Light* l2) {
+	return (tan(l1->angle) * l1->x - tan(l2->angle) * l2->x) / (tan(l1->angle) - tan(l2->angle));
 }
 
 void main() {
-	double K9 = 1.516374, ZF1 = 1.647664;
-	Light* l = createLight(0.0, 12.5, 0.0 / 180 * PI);
-	Light* t = createLight(0.0, -12.5, 0.0 / 180 * PI);
-	Surface* s = createSurface(0, 82.2, K9);
-	s->next = createSurface(5.5, -57.81, ZF1);
-	s->next->next = createSurface(5.5 + 3.0, -4742, 1.0);
-	s->next->next->next = createSurface(5.5 + 3.0 + 2.8, 71.45, K9);
-	s->next->next->next->next = createSurface(5.5 + 3.0 + 2.8 + 3.5, 65535.0, 1.0);
+	double K9 = 1.516374, ZF1 = 1.647664, AIR = 1.0;
+	Light* l = createLight(0.0, 25, 2.0 / 180 * PI);
+	Light* t = createLight(0.0, -25, 2.0 / 180 * PI);
+	Surface* s = createSurface(0, 140.572829, K9);
+	s->next = createSurface(20.084068, -50.125809, ZF1);
+	s->next->next = createSurface(20.084068 + 3.946442, -133.612542, AIR);
+	s->next->next->next = createSurface(20.084068 + 3.946442 + 57.440696, -2322.779152, K9);
+	s->next->next->next->next = createSurface(20.084068 + 3.946442 + 57.440696 + 3.991482, -114.722180, AIR);
 	onUpdate(l, s);
 	onUpdate(t, s);
-
-	printf("\nResult:\n");
+	printf("Result:\n");
 	showLight("Light 1", l);
 	showLight("Light 2", t);
+	double x1 = calcNode(l, t);
+
+	l = createLight(0.0, 25, -2.0 / 180 * PI);
+	t = createLight(0.0, -25, -2.0 / 180 * PI);
+	onUpdate(l, s);
+	onUpdate(t, s);
+	printf("Result:\n");
+	showLight("Light 1", l);
+	showLight("Light 2", t);
+	double x2 = calcNode(l, t);
+
+	printf("Result:\n");
+	printf("Light 1 node: %lf\n", x1);
+	printf("Light 2 node: %lf\n", x2);
+	printf("Light diff: %lf\n", x2 - x1);
 	system("pause");
 }
